@@ -2,28 +2,57 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float speed = 1f;
-    // Update is called once per frame
+    [Header("References")]
+    public SpriteRenderer mapRenderer;
+    
+    [Header("Movement")]
+    public float moveSpeed = 10f;
+
+    [Header("Padding")] 
+    public float verticalPadding = 0f;
+
+    private float leftX, rightX, minY, maxY, worldWidth;
+
+    void Start()
+    {
+        if (!mapRenderer)
+        {
+            Debug.LogError("CameraRig: mapRenderer not assigned.");
+            enabled = false;
+            return;
+        }
+        
+        Bounds b = mapRenderer.bounds;
+        
+        leftX = b.min.x;
+        rightX = b.max.x;
+        minY = b.min.y + verticalPadding;
+        maxY = b.max.y + verticalPadding;
+        
+        worldWidth = rightX - leftX;
+
+        if (worldWidth <= 0.0001f)
+        {
+            Debug.LogError("CameraRig: map width is zero?");
+            enabled = false;
+        }
+    }
+    
     void Update()
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.position += Vector3.left * speed * Time.deltaTime;
-        }
+        float xIn = Input.GetAxisRaw("Horizontal");
+        float yIn = Input.GetAxisRaw("Vertical");
+        
+        Vector3 p = transform.position;
+        p.x += xIn * moveSpeed * Time.deltaTime;
+        p.y += yIn * moveSpeed * Time.deltaTime;
+        
+        p.y = Mathf.Clamp(p.y, minY, maxY);
 
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.position += Vector3.right * speed * Time.deltaTime;
-        }
+        float relX = p.x - leftX;
+        relX = Mathf.Repeat(relX, worldWidth);
+        p.x = leftX + relX;
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.position += Vector3.up * speed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.position += Vector3.down * speed * Time.deltaTime;
-        }
+        transform.position = p;
     }
 }
