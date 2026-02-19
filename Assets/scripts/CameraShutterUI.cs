@@ -20,7 +20,6 @@ public class CameraShutterUI : MonoBehaviour
         {
 	        StartCoroutine(Flash());
         }
-        Debug.Log("Pressed space");
     }
 
     IEnumerator Flash()
