@@ -9,14 +9,24 @@ public class PhotoScoring : MonoBehaviour
     public float maxCenterDistance = 0.35f;
     public AnimationCurve centerScoreCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-    [Header("Input")] public KeyCode shutterKey = KeyCode.Space;
+    [Header("Input")] 
+    public KeyCode shutterKey = KeyCode.Space;
+    
+    [Header("Shutter")]
+    public float shutterCooldown = 0.5f;
+
+    private float nextAllowedShotTime = 0f;
     
     void Update()
     {
-        if (Input.GetKey(shutterKey))
-        {
-            TakePhotoAndScore();
-        }
+        bool pressed = Input.GetKeyDown(shutterKey);
+        if (!pressed) return;
+
+        if (Time.time < nextAllowedShotTime) return;
+        
+        nextAllowedShotTime = Time.time + shutterCooldown;
+        
+        TakePhotoAndScore();
     }
 
     void TakePhotoAndScore()
@@ -65,6 +75,9 @@ public class PhotoScoring : MonoBehaviour
         int basePts = best.basePoints;
         int score = Mathf.RoundToInt(basePts * Mathf.Clamp01(quality));
 
-        Debug.Log($"Photo hit {best.name} | dist={bestDist:F3} | quality={quality:F2} | +{score}");
+        if (ScoreManager.Instance != null)
+            ScoreManager.Instance.AddScore(score);
+
+        Debug.Log($"Photo hit {best.name} | +{score}");
     }
 }
