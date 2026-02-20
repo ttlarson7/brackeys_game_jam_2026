@@ -30,12 +30,6 @@ public class CameraMovement : MonoBehaviour
         maxY = b.max.y + verticalPadding;
         
         worldWidth = rightX - leftX;
-
-        if (worldWidth <= 0.0001f)
-        {
-            Debug.LogError("CameraRig: map width is zero?");
-            enabled = false;
-        }
     }
     
     void Update()
