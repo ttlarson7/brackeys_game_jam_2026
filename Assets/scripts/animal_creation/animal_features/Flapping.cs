@@ -4,10 +4,9 @@ public class FlapAnimation : MonoBehaviour
 {
     public float flapInterval = 0.1f;
     public float pauseInterval = 0.5f;
-    public bool useSquish = false;      // Toggle in inspector
-    public float flapScaleY = 0.05f;   // Only used when squishing
-
-    private SpriteRenderer sr;
+    public bool useSquish = false;
+    public float flapScaleY = 0.05f;
+    public SpriteRenderer wing;
     private int flapCount = 0;
     private float timer = 0f;
     private bool isPausing = false;
@@ -16,8 +15,9 @@ public class FlapAnimation : MonoBehaviour
 
     void Start()
     {
-        sr = GetComponent<SpriteRenderer>();
         originalScale = transform.localScale;
+        
+        wing.material.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
     }
 
     void Update()
@@ -47,7 +47,9 @@ public class FlapAnimation : MonoBehaviour
                 }
                 else
                 {
-                    sr.flipY = !sr.flipY;
+                    transform.localEulerAngles = isFlapped
+                        ? new Vector3(0f, 0f, -90f)
+                        : new Vector3(0,0,0f);
                 }
 
                 flapCount++;
