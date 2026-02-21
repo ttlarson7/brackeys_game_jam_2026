@@ -451,6 +451,7 @@ MonoBehaviour:
   eye: {fileID: 7104860122715727290, guid: fe4b8117355b70742ba84fbb02469e35, type: 3}
   features:
   - {fileID: 7317186339451642626, guid: 4558b483edf17934eb138583f0a2733a, type: 3}
+  - {fileID: 7104860122715727290, guid: fe4b8117355b70742ba84fbb02469e35, type: 3}
   featureSpawnChange: 0.5
 --- !u!4 &500684395
 Transform:
@@ -631,7 +632,7 @@ Transform:
   m_GameObject: {fileID: 659767341}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1009,7 +1010,7 @@ Transform:
   m_GameObject: {fileID: 1528869166}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

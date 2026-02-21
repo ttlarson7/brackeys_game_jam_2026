@@ -54,7 +54,15 @@ public class ShapeChainSpawner : MonoBehaviour
             GameObject shape = CreateShape(type, color, pos);
             shape.transform.position = new Vector3(pos.x, pos.y, 1);
             _chain.Add(shape);
+            if (i == 0)
+            {
+                AttachEye(shape);
+            }
 
+            if (i == count - 1)
+            {
+                AttachEye(shape);
+            }
             if (i > 0)
             {
                 ConnectShapes(_chain[i - 1], shape);
@@ -146,6 +154,7 @@ public class ShapeChainSpawner : MonoBehaviour
         rb.linearDamping = 0.5f;
         rb.angularDamping = 0.5f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        rb.freezeRotation = true;
     }
 
     private void ConnectShapes(GameObject from, GameObject to)
@@ -258,10 +267,11 @@ public class ShapeChainSpawner : MonoBehaviour
 
     private void AttachRandomAccessory(GameObject shape)
     {
-        if (features.Length == 0)
+        if (features.Length == 0 || Random.Range(0, 1.0f) < .5)
         {
             return;
         }
+        
         
         int feature =  Random.Range(0, features.Length);
         GameObject prefab =  features[feature];
@@ -276,4 +286,26 @@ public class ShapeChainSpawner : MonoBehaviour
         GameObject newFeature = Instantiate(prefab, shape.transform);
         newFeature.transform.localPosition = new Vector3(randomOffset.x, randomOffset.y, -5f);
     }
+
+    private void AttachEye(GameObject shape)
+    {
+        int numEyes = Random.Range(0, 4);
+        for (int i = 0; i < numEyes; i++)
+        {
+            GameObject prefab =  eye;
+            Bounds bounds =  shape.GetComponent<Renderer>().bounds;
+        
+            Vector2 randomOffset = new Vector3(
+                Random.Range(-bounds.extents.x * 0.15f, bounds.extents.x * 0.15f),
+                Random.Range(-bounds.extents.y * 0.15f, bounds.extents.y * 0.15f),
+                1
+            );
+
+            GameObject newFeature = Instantiate(prefab, shape.transform);
+            newFeature.transform.localPosition = new Vector3(randomOffset.x, randomOffset.y, -5f);
+        }
+        
+    }
+    
+    
 }
