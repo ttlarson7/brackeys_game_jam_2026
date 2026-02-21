@@ -50,6 +50,8 @@ public class PhotoScoring : MonoBehaviour
         {
             Vector3 vp = mainCam.WorldToViewportPoint(t.transform.position);
 
+            if (t.captured) continue;
+
             if (vp.z <= 0f) continue;
 
             if (vp.x < 0f || vp.x > 1f || vp.y < 0f || vp.y > 1f) continue;
@@ -78,6 +80,6 @@ public class PhotoScoring : MonoBehaviour
         if (ScoreManager.Instance != null)
             ScoreManager.Instance.AddScore(score);
 
-        Debug.Log($"Photo hit {best.name} | +{score}");
+        best.captured = true;
     }
 }
