@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3888307210571707501}
   - component: {fileID: 488499382175173101}
-  - component: {fileID: 1596879185652571036}
   m_Layer: 0
   m_Name: Wing
   m_TagString: Untagged
@@ -27,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1883185662402631700}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.38268343, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: -0.1, y: -0.1, z: 2}
   m_LocalScale: {x: 0.28899184, y: 0.24023412, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -88,22 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1596879185652571036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1883185662402631700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f9dd0f9513900541a01d8b9aa5e0c9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  flapInterval: 0.1
-  pauseInterval: 0.5
-  useSquish: 1
-  flapScaleY: 0.1
 --- !u!1 &7317186339451642626
 GameObject:
   m_ObjectHideFlags: 0
@@ -113,6 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 453401620481532686}
+  - component: {fileID: 3029564269292419965}
   m_Layer: 0
   m_Name: WingedPart
   m_TagString: Untagged
@@ -129,10 +113,27 @@ Transform:
   m_GameObject: {fileID: 7317186339451642626}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3888307210571707501}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3029564269292419965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7317186339451642626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9dd0f9513900541a01d8b9aa5e0c9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flapInterval: 0.1
+  pauseInterval: 0.5
+  useSquish: 0
+  flapScaleY: 0.1
+  wing: {fileID: 488499382175173101}
