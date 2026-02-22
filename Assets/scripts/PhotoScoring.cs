@@ -48,7 +48,7 @@ public class PhotoScoring : MonoBehaviour
 
         foreach (var t in targets)
         {
-            Vector3 vp = mainCam.WorldToViewportPoint(t.transform.position);
+            Vector3 vp = mainCam.WorldToViewportPoint(t.GetAimPoint());
 
             if (t.captured) continue;
 
