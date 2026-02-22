@@ -14,12 +14,16 @@ public class ShapeChainSpawner : MonoBehaviour
     public GameObject eye;
     public GameObject[] features;
     public float featureSpawnChange = 0.5f;
-    
-    private List<GameObject> _chain = new List<GameObject>();
+    public int numCreatures = 4;
+    public GameObject background;
+
+    // Each creature is a list of its shapes
+    private List<List<GameObject>> _creatures = new List<List<GameObject>>();
+    private List<GameObject> _parents = new List<GameObject>();
+
     private GameObject _dragTarget;
     private Vector2 _dragOffset;
     private Camera _cam;
-    
 
     private enum ShapeType { Circle, Square, Triangle }
 
@@ -27,7 +31,10 @@ public class ShapeChainSpawner : MonoBehaviour
     {
         _cam = Camera.main;
         spacing = 2f * shapeSize;
-        SpawnChain();
+        for (int i = 0; i < numCreatures; i++)
+        {
+            SpawnChain();
+        }
     }
 
     private void Update()
@@ -37,63 +44,83 @@ public class ShapeChainSpawner : MonoBehaviour
 
     public void Respawn()
     {
-        DestroyChain();
-        SpawnChain();
+        DestroyAll();
+        for (int i = 0; i < numCreatures; i++)
+        {
+            SpawnChain();
+        }
     }
 
     private void SpawnChain()
     {
         int count = Random.Range(1, 6);
+        List<GameObject> chain = new List<GameObject>();
+
+        GameObject parent = new GameObject("Creature_" + _parents.Count);
+        _parents.Add(parent);
+
+        Vector2 origin = spawnOrigin;
+        if (background != null)
+        {
+            Bounds b = background.GetComponent<Renderer>().bounds;
+            float chainWidth = (count - 1) * spacing;
+            origin = new Vector2(
+                Random.Range(b.min.x, b.max.x - chainWidth),
+                Random.Range(b.min.y, b.max.y)
+            );
+        }
 
         for (int i = 0; i < count; i++)
         {
-            Vector2 pos = spawnOrigin + Vector2.right * (i * spacing);
+            Vector2 pos = origin + Vector2.right * (i * spacing);
             ShapeType type = (ShapeType)Random.Range(0, 3);
             Color color = Random.ColorHSV(0f, 1f, 0.6f, 1f, 0.7f, 1f);
 
-            GameObject shape = CreateShape(type, color, pos);
-            shape.transform.position = new Vector3(pos.x, pos.y, 1);
-            _chain.Add(shape);
+            GameObject shape = CreateShape(type, color, pos, parent);
+            chain.Add(shape);
+
             if (i == 0)
-            {
                 AttachEye(shape);
-            }
 
             if (i == count - 1)
-            {
                 AttachEye(shape);
-            }
+
             if (i > 0)
             {
-                ConnectShapes(_chain[i - 1], shape);
+                ConnectShapes(chain[i - 1], shape);
                 AttachRandomAccessory(shape);
             }
         }
 
-        if (anchorFirstShape && _chain.Count > 0)
-            _chain[0].GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+        if (anchorFirstShape && chain.Count > 0)
+            chain[0].GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+        var target = parent.AddComponent<PhotoTarget>();
+        target.basePoints = Random.Range(50, 200);
+        _creatures.Add(chain);
     }
 
-    private void DestroyChain()
+    private void DestroyAll()
     {
-        foreach (var go in _chain)
-            if (go != null) Destroy(go);
-        _chain.Clear();
+        foreach (var p in _parents)
+            if (p != null) Destroy(p);
+        _parents.Clear();
+        _creatures.Clear();
     }
 
-    private GameObject CreateShape(ShapeType type, Color color, Vector2 position)
+    private GameObject CreateShape(ShapeType type, Color color, Vector2 position, GameObject parent)
     {
         switch (type)
         {
-            case ShapeType.Circle:  return CreateCircle(color, position);
-            case ShapeType.Square:  return CreateSquare(color, position);
-            default:                return CreateTriangle(color, position);
+            case ShapeType.Circle:   return CreateCircle(color, position, parent);
+            case ShapeType.Square:   return CreateSquare(color, position, parent);
+            default:                 return CreateTriangle(color, position, parent);
         }
     }
 
-    private GameObject CreateCircle(Color color, Vector2 pos)
+    private GameObject CreateCircle(Color color, Vector2 pos, GameObject parent)
     {
         var go = new GameObject("Circle");
+        go.transform.SetParent(parent.transform, false);
         go.transform.position = pos;
 
         var sr = go.AddComponent<SpriteRenderer>();
@@ -104,13 +131,13 @@ public class ShapeChainSpawner : MonoBehaviour
         var col = go.AddComponent<CircleCollider2D>();
         col.radius = 0.5f;
         AddRigidbody(go);
-
         return go;
     }
 
-    private GameObject CreateSquare(Color color, Vector2 pos)
+    private GameObject CreateSquare(Color color, Vector2 pos, GameObject parent)
     {
         var go = new GameObject("Square");
+        go.transform.SetParent(parent.transform, false);
         go.transform.position = pos;
 
         var sr = go.AddComponent<SpriteRenderer>();
@@ -121,13 +148,13 @@ public class ShapeChainSpawner : MonoBehaviour
         var col = go.AddComponent<BoxCollider2D>();
         col.size = Vector2.one;
         AddRigidbody(go);
-
         return go;
     }
 
-    private GameObject CreateTriangle(Color color, Vector2 pos)
+    private GameObject CreateTriangle(Color color, Vector2 pos, GameObject parent)
     {
         var go = new GameObject("Triangle");
+        go.transform.SetParent(parent.transform, false);
         go.transform.position = pos;
 
         var sr = go.AddComponent<SpriteRenderer>();
@@ -143,7 +170,6 @@ public class ShapeChainSpawner : MonoBehaviour
             new Vector2( 0f,    0.433f)
         });
         AddRigidbody(go);
-
         return go;
     }
 
@@ -167,6 +193,14 @@ public class ShapeChainSpawner : MonoBehaviour
         spring.dampingRatio = 1f;
     }
 
+    // Find which creature a shape belongs to
+    private bool IsInAnyCreature(GameObject go)
+    {
+        foreach (var chain in _creatures)
+            if (chain.Contains(go)) return true;
+        return false;
+    }
+
     private void HandleMouseDrag()
     {
         if (Input.GetMouseButtonDown(0))
@@ -174,7 +208,7 @@ public class ShapeChainSpawner : MonoBehaviour
             Vector2 worldPos = _cam.ScreenToWorldPoint(Input.mousePosition);
             Collider2D hit = Physics2D.OverlapPoint(worldPos);
 
-            if (hit != null && _chain.Contains(hit.gameObject))
+            if (hit != null && IsInAnyCreature(hit.gameObject))
             {
                 _dragTarget = hit.gameObject;
                 var rb = _dragTarget.GetComponent<Rigidbody2D>();
@@ -267,20 +301,16 @@ public class ShapeChainSpawner : MonoBehaviour
 
     private void AttachRandomAccessory(GameObject shape)
     {
-        if (features.Length == 0 || Random.Range(0, 1.0f) < .5)
-        {
+        if (features.Length == 0 || Random.Range(0f, 1f) < 0.5f)
             return;
-        }
-        
-        
-        int feature =  Random.Range(0, features.Length);
-        GameObject prefab =  features[feature];
-        Bounds bounds =  shape.GetComponent<Renderer>().bounds;
-        
-        Vector2 randomOffset = new Vector3(
+
+        int feature = Random.Range(0, features.Length);
+        GameObject prefab = features[feature];
+        Bounds bounds = shape.GetComponent<Renderer>().bounds;
+
+        Vector2 randomOffset = new Vector2(
             Random.Range(-bounds.extents.x * 0.15f, bounds.extents.x * 0.15f),
-            Random.Range(-bounds.extents.y * 0.15f, bounds.extents.y * 0.15f),
-            1
+            Random.Range(-bounds.extents.y * 0.15f, bounds.extents.y * 0.15f)
         );
 
         GameObject newFeature = Instantiate(prefab, shape.transform);
@@ -292,20 +322,15 @@ public class ShapeChainSpawner : MonoBehaviour
         int numEyes = Random.Range(0, 4);
         for (int i = 0; i < numEyes; i++)
         {
-            GameObject prefab =  eye;
-            Bounds bounds =  shape.GetComponent<Renderer>().bounds;
-        
-            Vector2 randomOffset = new Vector3(
+            Bounds bounds = shape.GetComponent<Renderer>().bounds;
+
+            Vector2 randomOffset = new Vector2(
                 Random.Range(-bounds.extents.x * 0.15f, bounds.extents.x * 0.15f),
-                Random.Range(-bounds.extents.y * 0.15f, bounds.extents.y * 0.15f),
-                1
+                Random.Range(-bounds.extents.y * 0.15f, bounds.extents.y * 0.15f)
             );
 
-            GameObject newFeature = Instantiate(prefab, shape.transform);
+            GameObject newFeature = Instantiate(eye, shape.transform);
             newFeature.transform.localPosition = new Vector3(randomOffset.x, randomOffset.y, -5f);
         }
-        
     }
-    
-    
 }

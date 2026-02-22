@@ -97,6 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 453401620481532686}
   - component: {fileID: 3029564269292419965}
+  - component: {fileID: 4232758695309871842}
   m_Layer: 0
   m_Name: WingedPart
   m_TagString: Untagged
@@ -137,3 +138,17 @@ MonoBehaviour:
   useSquish: 0
   flapScaleY: 0.1
   wing: {fileID: 488499382175173101}
+--- !u!114 &4232758695309871842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7317186339451642626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5112dcfd826cb24a982aa21be9a2136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amplitude: 0.1
+  frequency: 1.5
