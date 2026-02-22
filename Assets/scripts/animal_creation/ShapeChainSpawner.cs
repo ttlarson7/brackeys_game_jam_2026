@@ -580,11 +580,24 @@ public class ShapeChainSpawner : MonoBehaviour
     private void SetParentToChainCenter(GameObject parent, List<GameObject> chain)
     {
         if (chain == null || chain.Count == 0) return;
-
+    
+        // Save current world positions so we can restore them
+        var worldPositions = new Vector3[chain.Count];
+        for (int i = 0; i < chain.Count; i++)
+            worldPositions[i] = chain[i].transform.position;
+    
+        // Compute center in world space
         Vector3 sum = Vector3.zero;
         for (int i = 0; i < chain.Count; i++)
-            sum += chain[i].transform.position;
-
-        parent.transform.position = sum / chain.Count;
+            sum += worldPositions[i];
+    
+        Vector3 center = sum / chain.Count;
+    
+        // Move parent to center...
+        parent.transform.position = center;
+    
+        // ...but restore the children so the creature stays where it spawned visually
+        for (int i = 0; i < chain.Count; i++)
+            chain[i].transform.position = worldPositions[i];
     }
 }
